@@ -77,7 +77,6 @@ class CartSerializer(serializers.ModelSerializer):
     price_grand_total = serializers.SerializerMethodField(method_name='price_main_total')
     total_quantity = serializers.SerializerMethodField(method_name='calculate_total_quantity')
 
-
     class Meta:
         model = Cart
         fields = ["id", 'cart_foods', 'price_grand_total', 'total_quantity']
@@ -140,7 +139,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["id", "first_name", "last_name", "image", "phone_number", "email"]
+        fields = ["id", "first_name", "last_name", "image", "phone_number"]
 
 
 class RatingSerializer(serializers.ModelSerializer):

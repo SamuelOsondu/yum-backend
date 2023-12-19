@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework_nested import routers
-from food.views import FavouriteViewSet, CartViewSet, CartFoodViewSet, MergeCartsView, RatingViewSet, AddressViewSet
+from food.views import FavouriteViewSet, CartViewSet, CartFoodViewSet, MergeCartsView, RatingViewSet, AddressViewSet, \
+    ProfileViewSet
 from payment.views import OrderViewSet, OrderFoodViewSet, webhook_handler
 from vendor.views import FoodViewSet
 
@@ -8,6 +9,7 @@ router = routers.DefaultRouter()
 router.register("foods", FoodViewSet)
 router.register("favourites", FavouriteViewSet, basename='favourites')
 router.register("address", AddressViewSet, basename="address")
+router.register("profile", ProfileViewSet, basename="profile")
 
 router.register("cart", CartViewSet, basename="carts")
 cart_router = routers.NestedSimpleRouter(router, "cart", lookup="cart")
@@ -29,9 +31,5 @@ urlpatterns = [
     path('', include(order_router.urls)),
 
     path('merge_carts/', MergeCartsView.as_view()),
-
     path('webhook_handler/', webhook_handler, name='webhook_handler'),
-
 ]
-
-

@@ -5,7 +5,6 @@ from food.models import Food, Cart
 from food.serializers import CartSerializer
 from billing.models import LocalGovernmentArea, State, WeightPriceRange
 from billing.serializers import LocalGovernmentAreaSerializer, StateSerializer
-# Create your views here.
 
 
 class StatesAPIView(APIView):
@@ -25,7 +24,7 @@ class LGAsByStateAPIView(APIView):
 class BillingPriceAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         cart_id = request.data.get("cart_id")
-        lga_id = request.data.get("lga_id")  # Get LGA ID from request data
+        lga_id = request.data.get("lga_id")
 
         if not lga_id:
             return Response({"error": "LGA ID is required in the request data."},
@@ -33,7 +32,7 @@ class BillingPriceAPIView(generics.CreateAPIView):
 
         try:
             cart = Cart.objects.get(id=cart_id)
-            cart_serializer = CartSerializer(cart)
+            cart_serializer = CartSerializer(cart, context={'request': request})
             cart_grand_total = cart_serializer.data['price_grand_total']
 
             total_price = 0
@@ -67,4 +66,3 @@ class BillingPriceAPIView(generics.CreateAPIView):
         except WeightPriceRange.DoesNotExist:
             return Response({"error": "Pricing not found for one or more foods in the cart."},
                             status=status.HTTP_404_NOT_FOUND)
-

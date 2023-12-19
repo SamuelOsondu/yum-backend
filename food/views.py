@@ -7,9 +7,9 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from billing.models import Address
-from food.models import Cart, CartFood, Favourite, Rating
+from food.models import Cart, CartFood, Favourite, Rating, Profile
 from food.serializers import CartSerializer, AddCartFoodSerializer, CartFoodSerializer, AddFavouriteSerializer, \
-    RemoveFavouriteSerializer, FavouriteSerialiizer, RatingSerializer, AddressSerializer
+    RemoveFavouriteSerializer, FavouriteSerialiizer, RatingSerializer, AddressSerializer, ProfileSerializer
 
 
 class CartViewSet(ModelViewSet):
@@ -138,5 +138,34 @@ class AddressViewSet(ModelViewSet):
             serializer.validated_data['user'] = request.user
             serializer.save()
             return Response("Address added successfully", status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileViewSet(ModelViewSet):
+    serializer_class = ProfileSerializer
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return the profile of the currently authenticated user
+        return Profile.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        # Check if a profile already exists for the authenticated user
+        existing_profile = Profile.objects.filter(user=request.user).first()
+
+        if existing_profile:
+            # Update the existing profile with the new data
+            serializer = ProfileSerializer(existing_profile, data=request.data)
+        else:
+            # Create a new profile if it doesn't exist
+            serializer = ProfileSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Assign the authenticated user as the profile's user
+            serializer.validated_data['user'] = request.user
+            serializer.save()
+            return Response("Profile created or updated successfully", status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
